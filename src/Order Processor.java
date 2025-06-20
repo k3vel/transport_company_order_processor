@@ -1,147 +1,184 @@
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-class Order implements Serializable {
-    private int orderId;
-    private String customer_name;
-    private String customer_contacts;
-    private Cargo cargo;
-    private String start;
-    private String destination;
-    private int flag; //1 - fastest option, 2 - cheapest option
 
-    public Order() {}
-    public Order(int orderId, String customer_name, String customer_contacts, Cargo cargo, String start, String destination, int flag) {
-        if (flag!=1 && flag!=2)
-            throw new IllegalArgumentException("Invalid flag");
-        this.orderId = orderId;
-        this.customer_name = customer_name;
-        this.customer_contacts = customer_contacts;
-        this.cargo = cargo;
-        this.start = start;
-        this.destination = destination;
-        this.flag = flag;
-    }
+class CompanyOrderProcessor {
+    private final ArrayList<TransportUnit> transportUnits;
+    private final Map<String, ArrayList<RouteSegment>> routes;
 
-    public int getOrderId() {return orderId;}
-    public String getCustomer_name() {return customer_name;}
-    public String getCustomer_contacts() {return customer_contacts;}
-    public Cargo getCargo() {return cargo;}
-    public String getStart() {return start;}
-    public String getDestination() {return destination;}
-    public int getFlag() {return flag;}
-
-    public void setOrderId(int orderId) {this.orderId = orderId;}
-    public void setCustomer_name(String customer_name) {this.customer_name = customer_name;}
-    public void setCustomer_contacts(String customer_contacts) {this.customer_contacts = customer_contacts;}
-    public void setCargo(Cargo cargo) {this.cargo = cargo;}
-    public void setStart(String start) {this.start = start;}
-    public void setDestination(String destination) {this.destination = destination;}
-    public void setFlag(int flag) {this.flag = flag;}
-
-    @Override
-    public String toString() {
-        String option="";
-        if (flag==1)
-            option="Fastest";
-        else option="Cheapest";
-        return orderId+"\nOrder: "+customer_name+" "+customer_contacts+"\n"+cargo+"\n"+start+"->"+destination+"\nOption: "+option;
-    }
-}
-class Response implements Serializable {
-    private final int status; //0 or 1
-    private final double price;
-    private final double time;
-
-    public Response(int status, double price, double time) {
-        if (status!=0 && status!=1)
-            throw new IllegalArgumentException("Invalid status");
-        this.status = status;
-        this.price = price;
-        this.time = time;
-    }
-    public Response(int status){
-        this(status,0,0);
-    }
-
-    public int getStatus() {return status;}
-    public double getPrice() {return price;}
-    public double getTime() {return time;}
-
-    @Override
-    public String toString() {
-        if (status==1)
-            return "Sorry but we do not serve this route.";
-        if (status==2)
-            return "Sorry but all transport units are currently busy.";
-        return "The order will cost "+price+" and take approximately "+time+" hours to complete.";
-    }
-}
-
-class CompanyOrderProcessor implements Serializable {
-    private ArrayList<TransportUnit> transportUnits;
-    private ArrayList<Route> routes;
-
-    public CompanyOrderProcessor(ArrayList<TransportUnit> transportUnits, ArrayList<Route> routes) {
+    public CompanyOrderProcessor(ArrayList<TransportUnit> transportUnits, Map<String, ArrayList<RouteSegment>> routes) {
         this.transportUnits = transportUnits;
+        this.transportUnits.sort(new Vehicle_Comparator());
         this.routes = routes;
     }
 
     public ArrayList<TransportUnit> getTransportUnits() {return transportUnits;}
-    public ArrayList<Route> getRoutes() {return routes;}
+    public Map<String, ArrayList<RouteSegment>> getRoutes() {return routes;}
 
-    public void addTransportUnit(TransportUnit transportUnit) {transportUnits.add(transportUnit);}
-    public void addRoute(Route route) {routes.add(route);}
+    private Time_and_Price Transportation_Details(TransportUnit transportUnit, String destination) {
+        HashMap<String,Time_and_Price> prices = new HashMap<>(routes.size());
+        HashMap<String,Boolean> is_final = new HashMap<>(routes.size());
+        final double INF = Double.MAX_VALUE;
+        for (String station : routes.keySet()) {
+            prices.put(station, new Time_and_Price(0.0,INF));
+            is_final.put(station, false);
+        }
+        prices.put(transportUnit.getLocation(), new Time_and_Price(0.0,0.0));
+        for (int i=0; i < routes.size(); i++) {
+            String current = nearest1(prices,is_final);
+            if (current==null)
+                return new Time_and_Price(-1.0,-1.0);
+            if (current.equals(destination))
+                return prices.get(destination);
+            is_final.put(current, true);
+            for (RouteSegment dest : routes.get(current)) {
+                Cargo empty_cargo = new Cargo("none",0.0,false,false);
+                if (!transportUnit.Can_Deliver(empty_cargo,dest))
+                    continue;
+                if (!is_final.get(dest.getDestination()) && prices.get(current).getPrice() +
+                transportUnit.Delivery_Price(empty_cargo,dest) < prices.get(dest.getDestination()).getPrice()) {
+                    prices.get(dest.getDestination()).setPrice(prices.get(current).getPrice() +
+                            transportUnit.Delivery_Price(empty_cargo,dest));
+                    prices.get(dest.getDestination()).setTime(prices.get(current).getTime() +
+                            transportUnit.Delivery_Time(empty_cargo,dest));
+                }
+            }
+        }
+        Time_and_Price res = prices.get(destination);
+        if (res.getPrice() == INF)
+            return new Time_and_Price(-1.0,-1.0);
+        return res;
+    }
+    private String nearest1(HashMap<String, Time_and_Price> prices, HashMap<String, Boolean> is_final) {
+        double min_price = Double.MAX_VALUE;
+        String nearest = null;
+        for (String station : routes.keySet()) {
+            if (prices.get(station).getPrice() < min_price && !is_final.get(station)) {
+                min_price = prices.get(station).getPrice();
+                nearest = station;
+            }
+        }
+        return nearest;
+    }
+    private String nearest2(HashMap<String, State> states, HashMap<String, Boolean> is_final) {
+        double min_price = Double.MAX_VALUE;
+        String nearest = null;
+        for (String station : routes.keySet()) {
+            if (states.get(station).getTp().getPrice() < min_price && !is_final.get(station)) {
+                min_price = states.get(station).getTp().getPrice();
+                nearest = station;
+            }
+        }
+        return nearest;
+    }
 
     public Response Process(Order order){
-        ArrayList<TransportUnit> buffer=new ArrayList<>();
-        TransportUnit optimal=null;
-        Response response;
-        double min;
-        Route route=null;
-        int check=0;
-        for (Route rt : routes) {
-            if (rt.getStart().equals(order.getStart()) && rt.getDestination().equals(order.getDestination())) {
-                route=new Route(rt);
-                check=1;
-                break;
-            }
-        }
-        if (check==0)
+        if (!routes.containsKey(order.getStart()) || !routes.containsKey(order.getDestination()))
             return new Response(1);
-        if (order.getFlag()==1){
-            for (TransportUnit unit: transportUnits)
-                if (unit.Can_Deliver(order.getCargo(),route))
-                    buffer.add(unit);
-            min=buffer.getFirst().Delivery_Time(order.getCargo(),route);
-            optimal=buffer.getFirst();
-            for (TransportUnit unit: buffer){
-                if (unit.Delivery_Time(order.getCargo(),route)<min){
-                    optimal=unit;
-                    min=unit.Delivery_Time(order.getCargo(),route);
-                }
-            }
-        }
-        else{
-            for (TransportUnit unit: transportUnits)
-                if (unit.Can_Deliver(order.getCargo(),route))
-                    buffer.add(unit);
-            min=buffer.getFirst().Delivery_Price(order.getCargo(),route);
-            optimal=buffer.getFirst();
-            for (TransportUnit unit: buffer){
-                if (unit.Delivery_Price(order.getCargo(),route)<min){
-                    optimal=unit;
-                    min=unit.Delivery_Price(order.getCargo(),route);
-                }
-            }
-        }
+        HashMap<String,State> states = new HashMap<>(routes.size());
+        HashMap<String,Boolean> is_final = new HashMap<>(routes.size());
+        final double INF = Double.MAX_VALUE;
+        Cargo cargo = order.getCargo();
 
-        if (optimal==null)
-            response=new Response(2);
-        response=new Response(0,optimal.Delivery_Price(order.getCargo(),route),optimal.Delivery_Time(order.getCargo(),route));
-        return response;
+        for (String station : routes.keySet()) {
+            states.put(station,new State(new Time_and_Price(0.0,INF),null,null));
+            is_final.put(station, false);
+        }
+        states.put(order.getStart(), new State(new Time_and_Price(0.0,0.0),null,null));
+
+        for (int i=0; i < routes.size(); i++) {
+            String current = nearest2(states,is_final);
+            if (current==null)
+                return new Response(1);
+            if (current.equals(order.getDestination()))
+                break;
+            is_final.put(current, true);
+            for (RouteSegment seg : routes.get(current)) {
+                String dest = seg.getDestination();
+                if (!is_final.get(dest)) {
+                    Time_and_Price min;
+                    TransportUnit best_veh = null;
+                    if (states.get(current).getVehicle() != null &&
+                            states.get(current).getVehicle().Can_Deliver(cargo, seg)) {
+                        best_veh = states.get(current).getVehicle();
+                        min = new Time_and_Price(best_veh.Delivery_Time(cargo, seg),
+                                best_veh.Delivery_Price(cargo, seg));
+                    } else
+                        min = new Time_and_Price(0, INF);
+                    for (TransportUnit vehicle : transportUnits) {
+                        if (vehicle.is_free() && vehicle.Can_Deliver(cargo, seg)) {
+                            Time_and_Price tpr = Transportation_Details(vehicle, current);
+                            tpr.addPrice(vehicle.Delivery_Price(cargo, seg));
+                            tpr.addTime(vehicle.Delivery_Time(cargo, seg));
+                            if (tpr.getPrice() < min.getPrice()) {
+                                min = tpr;
+                                best_veh = vehicle;
+                            }
+                        }
+                    }
+                    double new_price = min.getPrice() + states.get(current).getTp().getPrice(),
+                            old_price = states.get(dest).getTp().getPrice();
+                    if (new_price < old_price) {
+                        states.get(dest).getTp().setPrice(new_price);
+                        states.get(dest).getTp().setTime(min.getTime() +
+                                states.get(current).getTp().getTime());
+                        states.get(dest).setVehicle(best_veh);
+                        states.get(dest).setPredecessor(seg);
+                    }
+                }
+            }
+        }
+        if (states.get(order.getDestination()).getTp().getPrice() == INF)
+            return new Response(2);
+        ArrayList<Assignment> delivery_plan=new ArrayList<>();
+        String current = order.getDestination();
+        while (states.get(current).getPredecessor() != null) {
+            RouteSegment seg = states.get(current).getPredecessor();
+            Assignment a = new Assignment(seg, states.get(current).getVehicle());
+            delivery_plan.add(a);
+            current = seg.getStart();
+        }
+        Collections.reverse(delivery_plan);
+        double time = states.get(order.getDestination()).getTp().getTime(),
+                price = states.get(order.getDestination()).getTp().getPrice();
+        return new Response(0,delivery_plan,price,time);
     }
 }
+
+class Time_and_Price{
+    private double time;
+    private double price;
+
+    public Time_and_Price(double time, double price) {this.time=time;this.price=price;}
+    public double getTime() {return time;}
+    public double getPrice() {return price;}
+    public void addPrice(double price) {this.price += price;}
+    public void addTime(double time) {this.time += time;}
+    public void setPrice(double price) {this.price = price;}
+    public void setTime(double time) {this.time = time;}
+}
+
+
+class State{
+    private Time_and_Price tp;
+    private TransportUnit vehicle;
+    private RouteSegment predecessor;
+
+    public State(Time_and_Price tp, TransportUnit vehicle, RouteSegment predecessor) {
+        this.tp=tp;
+        this.vehicle=vehicle;
+        this.predecessor=predecessor;
+    }
+    public Time_and_Price getTp() {return tp;}
+    public TransportUnit getVehicle() {return vehicle;}
+    public RouteSegment getPredecessor() {return predecessor;}
+    public void setTp(Time_and_Price tp) {this.tp = tp;}
+    public void setVehicle(TransportUnit vehicle) {this.vehicle = vehicle;}
+    public void setPredecessor(RouteSegment predecessor) {this.predecessor = predecessor;}
+}
+
 /*
 Response status:
 0 - ok

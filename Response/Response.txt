@@ -1,1 +1,5 @@
-The order will cost 798720.0 and take approximately 1.6500000000000001 hours to complete.
+The order will cost 764875.0₴ and take approximately 22.60714285714286 hours to complete.
+
+Dnipro -> Odesa : vehicle №123
+Odesa -> Istanbul : vehicle №201
+

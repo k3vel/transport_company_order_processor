@@ -1,10 +1,10 @@
 import java.io.Serializable;
 
 class Cargo implements Serializable {
-    private String type;//enum
-    private double weight;
-    private boolean is_perishable;
-    private boolean is_fragile;
+    private final String type;//enum
+    private final double weight;
+    private final boolean is_perishable;
+    private final boolean is_fragile;
 
     public Cargo(String type, double weight, boolean is_perishable, boolean is_fragile) {
         this.type = type;
@@ -12,7 +12,6 @@ class Cargo implements Serializable {
         this.is_perishable = is_perishable;
         this.is_fragile = is_fragile;
     }
-    public Cargo(){}
     public Cargo(Cargo c){
         this.type = c.getType();
         this.weight = c.getWeight();
@@ -24,11 +23,6 @@ class Cargo implements Serializable {
     public double getWeight() {return weight;}
     public boolean is_perishable() {return is_perishable;}
     public boolean is_fragile() {return is_fragile;}
-
-    public void setType(String type) {this.type = type;}
-    public void setWeight(double weight) {this.weight = weight;}
-    public void setIs_perishable(boolean is_perishable) {this.is_perishable = is_perishable;}
-    public void setIs_fragile(boolean is_fragile) {this.is_fragile = is_fragile;}
 
     @Override
     public String toString() {
