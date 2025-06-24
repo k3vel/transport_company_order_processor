@@ -28,6 +28,7 @@ class Order implements Serializable {
 
     @Override
     public String toString() {
-        return orderId+"\nOrder: "+customer_name+" "+customer_contacts+"\n"+cargo+"\n"+start+"->"+destination+"\n";
+        return "Order №" + orderId + " " + customer_name + ". Contacts: " + customer_contacts + "\n   " + cargo +
+                "\n   " + start + "->" + destination + "\n";
     }
 }

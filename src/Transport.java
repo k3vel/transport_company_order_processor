@@ -84,7 +84,8 @@ class Truck extends TransportUnit implements Serializable{
             return false;
         if (cargo.is_perishable() && !has_refregerator())
             return false;
-        if (route.getType()==2 || route.getType()==3 || route.getType()==6)
+        if (route.getType() == RouteSegment.RouteType.WATER || route.getType() == RouteSegment.RouteType.AIR ||
+                route.getType() == RouteSegment.RouteType.WATER_AND_AIR)
             return false;
         if (route.getDifficulty_index()>=0.7)
             return false;
@@ -111,7 +112,8 @@ class Ferry extends TransportUnit implements Serializable{
             return false;
         if (cargo.is_perishable() && !has_refregerator())
             return false;
-        if (route.getType()==1 || route.getType()==3 || route.getType()==5)
+        if (route.getType() == RouteSegment.RouteType.GROUND || route.getType() == RouteSegment.RouteType.AIR ||
+                route.getType() == RouteSegment.RouteType.AIR_AND_GROUND)
             return false;
         return true;
     }
@@ -136,7 +138,8 @@ class Plane extends TransportUnit implements Serializable{
             return false;
         if (cargo.is_perishable() && !has_refregerator())
             return false;
-        if (route.getType()==1 || route.getType()==2 || route.getType()==4)
+        if (route.getType() == RouteSegment.RouteType.GROUND || route.getType() == RouteSegment.RouteType.WATER ||
+                route.getType() == RouteSegment.RouteType.GROUND_AND_WATER)
             return false;
         return true;
     }
@@ -162,7 +165,8 @@ class Drone extends TransportUnit implements Serializable{
             return false;
         if (getCapacity()<cargo.getWeight())
             return false;
-        if (route.getType()==1 || route.getType()==2 || route.getType()==4)
+        if (route.getType() == RouteSegment.RouteType.GROUND || route.getType() == RouteSegment.RouteType.WATER ||
+                route.getType() == RouteSegment.RouteType.GROUND_AND_WATER)
             return false;
         if (route.getDistance()>max_distance)
             return false;

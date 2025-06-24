@@ -146,6 +146,13 @@ class CompanyOrderProcessor {
         return new Response(0,delivery_plan,price,time);
     }
 }
+/*
+Response status:
+0 - ok
+1 - wrong route
+2 - no transport can deliver this
+ */
+
 
 class Time_and_Price{
     private double time;
@@ -178,10 +185,3 @@ class State{
     public void setVehicle(TransportUnit vehicle) {this.vehicle = vehicle;}
     public void setPredecessor(RouteSegment predecessor) {this.predecessor = predecessor;}
 }
-
-/*
-Response status:
-0 - ok
-1 - wrong route
-2 - no transport can deliver this
- */
