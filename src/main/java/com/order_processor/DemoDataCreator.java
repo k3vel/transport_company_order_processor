@@ -1,4 +1,9 @@
-import java.io.FileNotFoundException;
+package com.order_processor;
+
+import com.order_processor.models.*;
+import com.order_processor.models.transport.*;
+import com.order_processor.processing.Order;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -6,12 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-class DemoDataCreator{
+public class DemoDataCreator{
     public void writeDemoRoutes() throws IOException {
         Map<String, ArrayList<RouteSegment>> routes = new HashMap<>();
 
-        RouteSegment r1 = new RouteSegment("Zaporizhzhia","Dnipro",70,RouteSegment.RouteType.GROUND_AND_WATER,0.05),
-                r2 = new RouteSegment("Dnipro","Zaporizhzhia",70,RouteSegment.RouteType.GROUND_AND_WATER,0.05),
+        RouteSegment r1 = new RouteSegment("Zaporizhzhia","Dnipro",70, RouteSegment.RouteType.GROUND_AND_WATER,0.05),
+                r2 = new RouteSegment("Dnipro","Zaporizhzhia",70, RouteSegment.RouteType.GROUND_AND_WATER,0.05),
                 r3 = new RouteSegment("Dnipro","Kharkiv",220, RouteSegment.RouteType.AIR_AND_GROUND,0.1),
                 r4 = new RouteSegment("Kharkiv","Dnipro",220, RouteSegment.RouteType.AIR_AND_GROUND,0.1),
                 r5 = new RouteSegment("Dnipro","Odesa",450, RouteSegment.RouteType.GROUND,0.3),

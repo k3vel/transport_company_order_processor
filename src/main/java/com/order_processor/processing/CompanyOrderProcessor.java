@@ -1,16 +1,19 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+package com.order_processor.processing;
+
+import com.order_processor.models.Cargo;
+import com.order_processor.models.RouteSegment;
+import com.order_processor.models.transport.TransportUnit;
+
+import java.util.*;
 
 
-class CompanyOrderProcessor {
+public class CompanyOrderProcessor {
     private final ArrayList<TransportUnit> transportUnits;
     private final Map<String, ArrayList<RouteSegment>> routes;
 
     public CompanyOrderProcessor(ArrayList<TransportUnit> transportUnits, Map<String, ArrayList<RouteSegment>> routes) {
         this.transportUnits = transportUnits;
-        this.transportUnits.sort(new Vehicle_Comparator());
+        Collections.sort(this.transportUnits, Comparator.comparingDouble(TransportUnit::getPrice_per_km));
         this.routes = routes;
     }
 

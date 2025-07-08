@@ -1,6 +1,8 @@
+package com.order_processor.models;
+
 import java.io.Serializable;
 
-class Cargo implements Serializable {
+public class Cargo implements Serializable {
     private final String type;
     private final double weight;
     private final boolean is_perishable;

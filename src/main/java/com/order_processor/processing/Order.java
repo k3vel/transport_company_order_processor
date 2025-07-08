@@ -1,6 +1,10 @@
+package com.order_processor.processing;
+
+import com.order_processor.models.Cargo;
+
 import java.io.Serializable;
 
-class Order implements Serializable {
+public class Order implements Serializable {
     private int orderId;
     private String customer_name;
     private String customer_contacts;
@@ -28,7 +32,7 @@ class Order implements Serializable {
 
     @Override
     public String toString() {
-        return "Order №" + orderId + " " + customer_name + ". Contacts: " + customer_contacts + "\n   " + cargo +
+        return "com.order_processor.processing.Order №" + orderId + " " + customer_name + ". Contacts: " + customer_contacts + "\n   " + cargo +
                 "\n   " + start + "->" + destination + "\n";
     }
 }

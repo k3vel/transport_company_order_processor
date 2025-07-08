@@ -1,8 +1,13 @@
+package com.order_processor.processing;
+
+import com.order_processor.models.RouteSegment;
+import com.order_processor.models.transport.TransportUnit;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-class Response implements Serializable {
-    private final int status; //0 or 1
+public class Response implements Serializable {
+    private final int status;
     private final ArrayList<Assignment> delivery_plan;
     private final double price;
     private final double time;

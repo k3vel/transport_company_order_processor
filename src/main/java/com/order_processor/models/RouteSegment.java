@@ -1,6 +1,8 @@
+package com.order_processor.models;
+
 import java.io.Serializable;
 
-class RouteSegment implements Serializable {
+public class RouteSegment implements Serializable {
     private final String start;
     private final String destination;
     private final double distance;

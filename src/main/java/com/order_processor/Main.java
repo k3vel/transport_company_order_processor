@@ -1,18 +1,20 @@
-/*Develop a module responsible for accepting customer orders in a transport company.
-A customer order is submitted at the input with the following items: cargo to be transported, starting point,
-destination point, wishes (execute as quickly as possible/execute as cheaply as possible). The output should include
-the expected price and execution time, if the order can be processed, otherwise - a corresponding message
-for the client. A ready-made database of existing routes and available transport is provided for work.*/
+package com.order_processor;
+
+import com.order_processor.models.RouteSegment;
+import com.order_processor.models.transport.TransportUnit;
+import com.order_processor.processing.CompanyOrderProcessor;
+import com.order_processor.processing.Order;
+import com.order_processor.processing.Response;
+import com.order_processor.DemoDataCreator;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 /*
-        DemoDataCreator d = new DemoDataCreator();
+        DemoDataCreator d = new com.order_processor.DemoDataCreator();
         d.writeDemoRoutes();
         d.writeDemoTransport();
         d.writeDemoOrder(12087,"Bullets",10000,false,true,
