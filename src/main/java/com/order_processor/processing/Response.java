@@ -53,4 +53,13 @@ class Assignment implements Serializable {
     public TransportUnit getVehicle() {return vehicle;}
     public void setVehicle(TransportUnit vehicle) {this.vehicle = vehicle;}
     public void setSegment(RouteSegment segment) {this.segment = segment;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Assignment){
+            Assignment assignment = (Assignment) o;
+            return segment.equals(assignment.getSegment()) && vehicle.equals(assignment.getVehicle());
+        }
+        return false;
+    }
 }

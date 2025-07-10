@@ -17,8 +17,8 @@ public class Main {
         DemoDataCreator d = new com.order_processor.DemoDataCreator();
         d.writeDemoRoutes();
         d.writeDemoTransport();
-        d.writeDemoOrder(12087,"Bullets",10000,false,true,
-                "Joe Biden","228337","Dnipro","Istanbul");
+        d.writeDemoOrder(12087,"Bullets",1000,false,true,
+                "Joe Biden","228337","Kharkiv","Poltava");
 */
         ObjectInputStream ois1=new ObjectInputStream(new FileInputStream("Company Data/Routes.dat"));
         ObjectInputStream ois2=new ObjectInputStream(new FileInputStream("Company Data/Transport.dat"));

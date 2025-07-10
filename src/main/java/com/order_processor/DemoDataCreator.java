@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DemoDataCreator{
-    public void writeDemoRoutes() throws IOException {
+    public Map<String, ArrayList<RouteSegment>> createDemoRoutes() {
         Map<String, ArrayList<RouteSegment>> routes = new HashMap<>();
 
         RouteSegment r1 = new RouteSegment("Zaporizhzhia","Dnipro",70, RouteSegment.RouteType.GROUND_AND_WATER,0.05),
@@ -63,19 +63,27 @@ public class DemoDataCreator{
         routes.put("Istanbul", rt7);
         routes.put("Lviv", rt8);
 
+        return routes;
+    }
+    public void writeDemoRoutes() throws IOException {
+        Map<String, ArrayList<RouteSegment>> routes = createDemoRoutes();
         ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream("Company Data/Routes.dat"));
         oos.writeObject(routes);
         oos.close();
     }
-    public void writeDemoTransport() throws IOException {
-        ArrayList<TransportUnit> tr= new ArrayList<TransportUnit>();
+    public ArrayList<TransportUnit> createDemoTransport() {
+        ArrayList<TransportUnit> tr= new ArrayList<>();
         tr.add(new Truck(123,true,"Zaporizhzhia",20000,false,70, 50));
         tr.add(new Truck(125,true,"Lviv",16000,true,90,70));
         tr.add(new Ferry(201,true,"Odesa",1000000,true,50,1000));
         tr.add(new Plane(330,true,"Kyiv",50000,true,400,1100));
         tr.add(new Plane(344,true,"Kharkiv",60000,false,370,1100));
-        tr.add(new Drone(612,true,"Dnipro",20,false,100,10,40));
+        tr.add(new Drone(612,true,"Dnipro",20,100,10,40));
 
+        return tr;
+    }
+    public void writeDemoTransport() throws IOException {
+        ArrayList<TransportUnit> tr = createDemoTransport();
         ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream("Company Data/Transport.dat"));
         oos.writeObject(tr);
         oos.close();

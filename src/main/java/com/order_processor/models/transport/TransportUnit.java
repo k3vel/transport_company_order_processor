@@ -62,4 +62,14 @@ public abstract class TransportUnit implements Serializable {
 
         return "Id: "+id+" "+isfr+" Capacity: "+capacity+" "+href+" "+avg_speed+" km/h "+price_per_km+"₴";
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TransportUnit){
+            TransportUnit other = (TransportUnit) obj;
+            return this.id == other.id && this.is_free == other.is_free && (this.location).equals(other.location) &&
+                    this.capacity == other.capacity && this.has_refregerator == other.has_refregerator &&
+                    this.avg_speed == other.avg_speed && this.price_per_km == other.price_per_km;
+        }
+        return false;
+    }
 }

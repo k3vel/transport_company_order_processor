@@ -9,9 +9,9 @@ public class Drone extends TransportUnit implements Serializable {
     private double max_distance;
 
     public Drone(){}
-    public Drone(int id, boolean is_free, String location, double capacity, boolean has_refregerator,
-                 double avg_speed, double price_per_km, double max_distance){
-        super(id,is_free,location,capacity,has_refregerator,avg_speed,price_per_km);
+    public Drone(int id, boolean is_free, String location, double capacity, double avg_speed, double price_per_km,
+                 double max_distance){
+        super(id,is_free,location,capacity,false,avg_speed,price_per_km);
         this.max_distance=max_distance;
     }
 
@@ -20,6 +20,8 @@ public class Drone extends TransportUnit implements Serializable {
         if (!is_free())
             return false;
         if (getCapacity()<cargo.getWeight())
+            return false;
+        if (cargo.is_perishable())
             return false;
         if (route.getType() == RouteSegment.RouteType.GROUND || route.getType() == RouteSegment.RouteType.WATER ||
                 route.getType() == RouteSegment.RouteType.GROUND_AND_WATER)

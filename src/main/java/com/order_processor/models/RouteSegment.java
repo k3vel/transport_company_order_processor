@@ -31,4 +31,14 @@ public class RouteSegment implements Serializable {
     public String toString() {
         return start+" -> "+destination+" "+distance+" km "+type.name()+" index: "+difficulty_index;
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof RouteSegment) {
+            RouteSegment other = (RouteSegment) obj;
+            return (this.start).equals(other.start) && this.destination.equals(other.destination) &&
+                    this.distance == other.distance && this.type == other.type && this.difficulty_index ==
+                    other.difficulty_index;
+        }
+        return false;
+    }
 }
