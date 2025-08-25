@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Main {
+public class Launcher {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 /*
         DemoDataCreator d = new com.order_processor.DemoDataCreator();
